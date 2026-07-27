@@ -23,7 +23,8 @@ mileage: {
 },
 userId: {
     type: ObjectId,
-    ref: "User"
+    ref: "User",
+    required: true
 },
 }, { timestamps: { createdAt: 'created_at' }    
 });

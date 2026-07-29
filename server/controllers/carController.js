@@ -37,10 +37,21 @@ async function getCarById(req,res){
     }
 }
 
+async function editCar(req,res){
+    try{
+        const updatedCar = await Car.findByIdAndUpdate(req.params.id, req.body,{ new: true, runValidators: true })
+        if(!updatedCar) return res.status(404).json({error: 'Car not found'});
+        res.status(200).json(updatedCar);
+    }catch(error){
+        res.status(400).json({ error: error.message });
+    }
+}
+
 
 module.exports = {
     createCar,
     getAllCars,
-    getCarById
+    getCarById,
+    editCar
 };
 

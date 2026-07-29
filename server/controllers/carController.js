@@ -47,11 +47,22 @@ async function editCar(req,res){
     }
 }
 
+async function deletaCar (req,res){
+    try{
+        const deletedCar  = await Car.findByIdAndDelete(req.params.id);
+        if(!deletedCar) return res.status(404).json({error: 'Car not found'});
+        res.status(200).json({message: 'Car deleted successfully'});
+    }catch(error){
+        res.status(400).json({ error: error.message });
+    }
+}
+
 
 module.exports = {
     createCar,
     getAllCars,
     getCarById,
-    editCar
+    editCar,
+    deletaCar
 };
 

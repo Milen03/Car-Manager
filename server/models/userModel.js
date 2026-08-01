@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema({
     posts: [{
         type: ObjectId,
         ref: "Post"
+    }],
+    cars: [{
+        type: ObjectId,
+        ref: "Car"
     }]
 }, { timestamps: { createdAt: 'created_at' } });
 

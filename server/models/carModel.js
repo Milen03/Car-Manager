@@ -26,6 +26,10 @@ userId: {
     ref: "User",
     required: true
 },
+services: [{
+    type: ObjectId,
+    ref: "Service"
+}]
 }, { timestamps: { createdAt: 'created_at' }    
 });
 

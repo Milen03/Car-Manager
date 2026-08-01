@@ -4,7 +4,7 @@ const config = {
     development: {
         port: process.env.PORT || 3000,
         dbURL: 'mongodb://localhost:27017/forum',
-        origin: ['http://localhost:5555', 'http://localhost:4200']
+        origin: ['http://localhost:5555', 'http://localhost:4200', 'http://localhost:5173']
     },
     production: {
         port: process.env.PORT || 3000,

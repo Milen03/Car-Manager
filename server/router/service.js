@@ -3,9 +3,9 @@ const router = express.Router();
 const { auth } = require('../utils');
 const { serviceController } = require('../controllers');
 
-router.get('/', serviceController.getServices);
+router.get('/:carId', serviceController.getServicesByCar);
 
-router.post('/', auth(), serviceController.createService);
+router.post('/:carId', auth(), serviceController.createService);
 
 router.put('/:serviceId', auth(), serviceController.editService);
 

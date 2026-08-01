@@ -5,14 +5,14 @@ const { carController } = require('../controllers');
 
 // middleware that is specific to this router
 
-router.get('/', carController.getCars);
+router.get('/', carController.getAllCars);
 
 router.post('/', auth(), carController.createCar);
 
-router.get('/:carId', carController.getCar);
+router.get('/:id', carController.getCarById);
 
-router.put('/:carId', auth(), carController.editCar);
+router.put('/:id', auth(), carController.editCar);
 
-router.delete('/:carId', auth(), carController.deleteCar);
+router.delete('/:id', auth(), carController.deleteCar);
 
 module.exports = router;

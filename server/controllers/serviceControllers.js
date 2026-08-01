@@ -2,7 +2,7 @@ const Service = require('../models').serviceModel;
 const Car = require('../models').carModel;
 
 const createService = async (req, res)  => {
-    const { _id: carId } = req.params;
+    const { carId } = req.params;
     const { type, mileagesAtService, changeEveryKm, notes } = req.body;
     try {
         const newService = await Service.create({
@@ -25,7 +25,7 @@ const createService = async (req, res)  => {
 }
 
 const getServicesByCar = async (req, res) => {
-    const { _id: carId } = req.params;
+    const { carId } = req.params;
     try {
         const services = await Service.find({ car: carId });
         if (!services || services.length === 0) {
@@ -38,7 +38,7 @@ const getServicesByCar = async (req, res) => {
 }
 
 const editService = async (req, res) => {
-    const { _id: serviceId } = req.params;
+    const { serviceId } = req.params;
     const { type, mileagesAtService, changeEveryKm, notes } = req.body;
     try {
         const updatedService = await Service.findByIdAndUpdate(serviceId, {
@@ -57,7 +57,7 @@ const editService = async (req, res) => {
 }
 
 const deleteService = async (req, res) => {     
-    const { _id: serviceId } = req.params;
+    const { serviceId } = req.params;
     try {
         const deletedService = await Service.findByIdAndDelete(serviceId);
         if (!deletedService) {

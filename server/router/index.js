@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const users = require('./users');
 const cars = require('./cars');
+const services = require('./service');  
 const themes = require('./themes');
 const posts = require('./posts');
 const likes = require('./likes');
@@ -18,5 +19,6 @@ router.use('/themes', themes);
 router.use('/posts', posts);
 router.use('/likes', likes);
 router.use('/test', test);
+router.use('/services', services); 
 
 module.exports = router;

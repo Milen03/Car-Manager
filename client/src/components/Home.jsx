@@ -1,11 +1,11 @@
 export function Home() {
 
     return (
-        <div className="relative min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100 flex flex-col items-center justify-center px-4 overflow-hidden">
+        <div className="relative min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-950 text-gray-100 flex flex-col items-center justify-center px-4 overflow-hidden">
             {/* soft radial yellow glow behind the content, stretched across the page */}
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_40%,rgba(250,204,21,0.15),transparent_70%)]" />
-            <div className="pointer-events-none absolute -top-1/3 -left-1/4 w-[40rem] h-[40rem] bg-yellow-500/10 rounded-full blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-1/3 -right-1/4 w-[40rem] h-[40rem] bg-yellow-500/10 rounded-full blur-3xl" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_40%,rgba(250,204,21,0.28),transparent_70%)]" />
+            <div className="pointer-events-none absolute -top-1/3 -left-1/4 w-[40rem] h-[40rem] bg-yellow-500/25 rounded-full blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-1/3 -right-1/4 w-[40rem] h-[40rem] bg-yellow-500/25 rounded-full blur-3xl" />
 
             <div className="relative text-center space-y-6 max-w-xl">
                 <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-yellow-400 opacity-0 [animation:fadeUp_0.6s_ease-out_forwards]">

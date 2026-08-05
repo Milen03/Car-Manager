@@ -1,4 +1,4 @@
-import request from './request'; // Make sure to import your request module
+import request from '../utils/request';
 const baseUrl = 'http://localhost:3000/api';
 
 export const useRegister = () => {

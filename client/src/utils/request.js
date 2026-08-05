@@ -1,5 +1,6 @@
 const request = async (method, url, data, options = {})=>{
 
+    options.credentials = 'include' // needed so the httpOnly auth cookie is sent/received cross-origin
 
     if (method !== 'GET') {
         options.method = method

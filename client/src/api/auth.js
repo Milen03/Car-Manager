@@ -11,8 +11,8 @@ export const useRegister = () => {
             const result = await request.post(`${baseUrl}/register`, { username, email, password })
             userLoginHandeler(result)
             return result
-        } catch (err) {
-            alert("Registration failed: " + err.message);
+        } catch (error) {
+            alert("Registration failed: " + error.message);
         }
     }
 
@@ -29,8 +29,8 @@ export const useLogin = () => {
             const result = await request.post(`${baseUrl}/login`, { email, password })
             userLoginHandeler(result)
             return result
-        }catch (err){
-            alert("Login failed: " + err.message);
+        }catch (error){
+            alert("Login failed: " + error.message);
         }
     }
     return {
@@ -46,8 +46,8 @@ export const useLogout = () => {
             const result = await request.post(`${baseUrl}/logout`)
             userLogoutHandeler()
             return result
-        }catch (err){
-            alert("Logout failed: " + err.message);
+        }catch (error){
+            alert("Logout failed: " + error.message);
         }   
     }
     return {

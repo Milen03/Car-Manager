@@ -11,7 +11,7 @@ export default function Nav() {
     const handleLogout = async () => {
         await logout()
         navigate('/login')
-    }
+    }   
 
     return (
         <nav className="fixed top-0 inset-x-0 z-20 flex items-center justify-end gap-3 px-6 py-5">

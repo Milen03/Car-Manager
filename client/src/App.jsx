@@ -9,6 +9,7 @@ import { Route, Routes } from 'react-router'
 import { UserProvider } from './contexts/UserContext.jsx'
 import usePersistedState from './hooks/usePersistedState.js'
 import CreateCar from './components/CarViews/CreateCar.jsx'
+import { Catalog } from './components/CarViews/catalog/Catalog.jsx'
 function App() {
   const [authData, setAuthData] = usePersistedState('auth', {})
 
@@ -27,8 +28,10 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path='/cars/create' element={<CreateCar />} />
         <Route path="/logout" element={<Logout />} />
+        <Route path='/cars/create' element={<CreateCar />} />
+        <Route path='/cars/catalog' element={<Catalog />} />
+        
       </Routes>
     </UserProvider>
   )

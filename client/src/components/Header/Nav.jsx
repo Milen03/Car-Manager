@@ -24,6 +24,7 @@ export default function Nav() {
     const userNav = [
         { name: 'Начало', href: '/' },
         { name: 'Добави кола', href: '/cars/create' },
+        { name: 'Каталог', href: '/cars/catalog' },
     ]
 
     const navItems = username ? userNav : guestNav

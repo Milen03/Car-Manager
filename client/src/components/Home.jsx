@@ -1,7 +1,7 @@
-
+import { Link } from 'react-router'
 
 export function Home() {
-  
+
 
     return (
         <div className="relative min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-950 text-gray-100 flex flex-col items-center justify-center px-4 overflow-hidden">
@@ -18,7 +18,7 @@ export function Home() {
                 <p className="text-gray-400 text-lg opacity-0 [animation:fadeUp_0.6s_ease-out_0.2s_forwards]">
                     Управлявай своите коли лесно и бързо на едно място.
                 </p>
-
+<Link to="/create" className="inline-block opacity-0 [animation:fadeUp_0.6s_ease-out_0.4s_forwards]">
                 <button
                     type="button"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-yellow-500 hover:bg-yellow-400
@@ -28,6 +28,7 @@ export function Home() {
                     <span className="text-xl leading-none">+</span>
                     Добави кола
                 </button>
+            </Link>
             </div>
         </div>
     )

@@ -20,7 +20,7 @@ async function createCar(req, res) {
 
 async function getAllCars(req, res) {
     try {
-        const cars = await Car.find({});
+        const cars = await Car.find({ userId: req.user._id });
         res.status(200).json(cars);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -39,7 +39,11 @@ async function getCarById(req,res){
 
 async function editCar(req,res){
     try{
-        const updatedCar = await Car.findByIdAndUpdate(req.params.id, req.body,{ new: true, runValidators: true })
+        const updatedCar = await Car.findOneAndUpdate(
+            { _id: req.params.id, userId: req.user._id },
+            req.body,
+            { new: true, runValidators: true }
+        );
         if(!updatedCar) return res.status(404).json({message: 'Car not found'});
         res.status(200).json(updatedCar);
     }catch(error){
@@ -49,7 +53,7 @@ async function editCar(req,res){
 
 async function deleteCar (req,res){
     try{
-        const deletedCar  = await Car.findByIdAndDelete(req.params.id);
+        const deletedCar  = await Car.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
         if(!deletedCar) return res.status(404).json({message: 'Car not found'});
         res.status(200).json({message: 'Car deleted successfully'});
     }catch(error){

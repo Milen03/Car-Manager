@@ -5,7 +5,7 @@ const { carController } = require('../controllers');
 
 // middleware that is specific to this router
 
-router.get('/', carController.getAllCars);
+router.get('/', auth(), carController.getAllCars);
 
 router.post('/', auth(), carController.createCar);
 

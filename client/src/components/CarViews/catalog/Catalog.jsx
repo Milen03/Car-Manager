@@ -5,7 +5,11 @@ export function Catalog() {
     const { cars } = useCars();
 
     if (!cars || cars.length === 0) {
-        return <p className="text-center text-gray-400">Няма налични коли.</p>
+        return (
+            <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+                <p className="text-center text-gray-400 text-lg">Няма налични коли.</p>
+            </div>
+        )
     }
     return (
         <div className="min-h-screen bg-gray-950 px-4 py-24">

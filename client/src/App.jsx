@@ -10,6 +10,7 @@ import { UserProvider } from './contexts/UserContext.jsx'
 import usePersistedState from './hooks/usePersistedState.js'
 import CreateCar from './components/CarViews/CreateCar.jsx'
 import { Catalog } from './components/CarViews/catalog/Catalog.jsx'
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx'
 function App() {
   const [authData, setAuthData] = usePersistedState('auth', {})
 
@@ -29,9 +30,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/logout" element={<Logout />} />
-        <Route path='/cars/create' element={<CreateCar />} />
-        <Route path='/cars/catalog' element={<Catalog />} />
-        
+        <Route path='/cars/create' element={<ProtectedRoute><CreateCar /></ProtectedRoute>} />
+        <Route path='/cars/catalog' element={<ProtectedRoute><Catalog /></ProtectedRoute>} />
+
       </Routes>
     </UserProvider>
   )

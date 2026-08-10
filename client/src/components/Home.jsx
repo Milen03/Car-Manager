@@ -18,15 +18,15 @@ export function Home() {
                 <p className="text-gray-400 text-lg opacity-0 [animation:fadeUp_0.6s_ease-out_0.2s_forwards]">
                     Управлявай своите коли лесно и бързо на едно място.
                 </p>
-<Link to="/create" className="inline-block opacity-0 [animation:fadeUp_0.6s_ease-out_0.4s_forwards]">
+<Link to="/cars/catalog" className="inline-block opacity-0 [animation:fadeUp_0.6s_ease-out_0.4s_forwards]">
                 <button
                     type="button"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-yellow-500 hover:bg-yellow-400
                                active:scale-95 transition-all duration-200 font-medium text-gray-900 shadow-lg shadow-yellow-900/40
                                cursor-pointer opacity-0 [animation:fadeUp_0.6s_ease-out_0.4s_forwards]"
                 >
-                    <span className="text-xl leading-none">+</span>
-                    Добави кола
+                   
+                    Виж твоя каталог
                 </button>
             </Link>
             </div>

@@ -26,13 +26,17 @@ function App() {
     <UserProvider value={{ ...authData, userLoginHandeler, userLogoutHandeler }}>
       <Nav />
       <Routes>
+        {/* AUTH ROUTES */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/logout" element={<Logout />} />
-        <Route path='/cars/create' element={<ProtectedRoute><CreateCar /></ProtectedRoute>} />
-        <Route path='/cars/catalog' element={<ProtectedRoute><Catalog /></ProtectedRoute>} />
 
+        {/* PROTECTED ROUTES */}
+        <Route element={<ProtectedRoute />}>
+        <Route path='/cars/create' element={<CreateCar />} />
+        <Route path='/cars/catalog' element={<Catalog />} />
+        </Route>
       </Routes>
     </UserProvider>
   )

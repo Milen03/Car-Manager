@@ -1,3 +1,5 @@
+import { Link } from 'react-router'
+
 export default function CatalogItem({
     _id,
     brand,
@@ -26,6 +28,14 @@ export default function CatalogItem({
                     <span>{registrationNumber}</span>
                 </p>
             </div>
+
+            <Link
+                to={`/cars/${_id}`}
+                className="mt-5 block text-center px-4 py-2 rounded-xl bg-yellow-500 hover:bg-yellow-400
+                           active:scale-95 transition-all duration-200 font-medium text-gray-900 shadow-lg shadow-yellow-900/40 cursor-pointer"
+            >
+                Отвори
+            </Link>
         </div>
     )
 }

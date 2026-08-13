@@ -9,7 +9,7 @@ router.get('/', auth(), carController.getAllCars);
 
 router.post('/', auth(), carController.createCar);
 
-router.get('/:id', carController.getCarById);
+router.get('/:id', auth(), carController.getCarById);
 
 router.put('/:id', auth(), carController.editCar);
 

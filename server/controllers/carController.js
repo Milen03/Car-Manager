@@ -29,7 +29,7 @@ async function getAllCars(req, res) {
 
 async function getCarById(req,res){
     try{
-        const car = await Car.findById(req.params.id);
+        const car = await Car.findOne({ _id: req.params.id, userId: req.user._id });
         if(!car) return res.status(404).json({message: 'Car not found'});
         res.status(200).json(car);
     }catch(error){

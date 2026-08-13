@@ -28,9 +28,6 @@ const getServicesByCar = async (req, res) => {
     const { carId } = req.params;
     try {
         const services = await Service.find({ car: carId });
-        if (!services || services.length === 0) {
-            return res.status(404).json({ error: 'No services found for this car' });
-        }
         res.status(200).json(services);
     } catch (error) {
         res.status(500).json({ error: error.message });

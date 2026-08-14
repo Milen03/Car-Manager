@@ -1,10 +1,20 @@
 import { useParams, useNavigate } from 'react-router'
-import { useCar } from '../../../api/car.js'
+import { useCar, useDelete } from '../../../api/car.js'
 
 export function CarDetails() {
     const { id } = useParams();
     const { car } = useCar(id);
+    const { deleteCar } = useDelete();
     const navigate = useNavigate();
+
+    const handleDelete = async () => {
+        if (!window.confirm('Сигурни ли сте, че искате да изтриете тази кола?')) return;
+
+        const result = await deleteCar(id);
+        if (!result) return;
+
+        navigate('/cars/catalog');
+    }
 
     if (!car) {
         return (
@@ -47,16 +57,34 @@ export function CarDetails() {
                         </div>
                     </div>
 
-                    {/* Дясна част: Бутон Назад */}
-                    <button
-                        type="button"
-                        onClick={() => navigate(-1)}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 hover:bg-gray-800
-                                   hover:border-yellow-500/50 active:scale-95 transition-all duration-200 font-medium text-gray-100 text-sm cursor-pointer"
-                    >
-                        <span aria-hidden="true">←</span>
-                        Назад
-                    </button>
+                    {/* Дясна част: Бутони за действия */}
+                    <div className="flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => navigate(`/cars/${id}/edit`)}
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-400
+                                       active:scale-95 transition-all duration-200 font-medium text-gray-900 text-sm cursor-pointer"
+                        >
+                            Редактирай
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleDelete}
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600/90 hover:bg-red-500
+                                       active:scale-95 transition-all duration-200 font-medium text-white text-sm cursor-pointer"
+                        >
+                            Изтрий
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => navigate(-1)}
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 hover:bg-gray-800
+                                       hover:border-yellow-500/50 active:scale-95 transition-all duration-200 font-medium text-gray-100 text-sm cursor-pointer"
+                        >
+                            <span aria-hidden="true">←</span>
+                            Назад
+                        </button>
+                    </div>
                 </div>
             </section>
         </div>

@@ -9,6 +9,7 @@ import { Route, Routes } from 'react-router'
 import { UserProvider } from './contexts/UserContext.jsx'
 import usePersistedState from './hooks/usePersistedState.js'
 import CreateCar from './components/CarViews/CreateCar.jsx'
+import EditCar from './components/CarViews/EditCar.jsx'
 import { Catalog } from './components/CarViews/catalog/Catalog.jsx'
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx'
 import { CarDetails } from './components/CarViews/details/CarDetails.jsx'
@@ -38,6 +39,7 @@ function App() {
         <Route path='/cars/create' element={<CreateCar />} />
         <Route path='/cars/catalog' element={<Catalog />} />
         <Route path='/cars/:id' element={<CarDetails />} />
+        <Route path='/cars/:id/edit' element={<EditCar />} />
         </Route>
       </Routes>
     </UserProvider>

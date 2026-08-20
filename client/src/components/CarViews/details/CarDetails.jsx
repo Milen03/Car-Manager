@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router'
 import { useCar, useDelete } from '../../../api/car.js'
+import { ServiceDetails } from './ServiceDetails.jsx'
 
 export function CarDetails() {
     const { id } = useParams();
@@ -87,6 +88,8 @@ export function CarDetails() {
                     </div>
                 </div>
             </section>
+
+            <ServiceDetails carId={id} />
         </div>
     )
 }

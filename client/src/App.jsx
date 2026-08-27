@@ -13,6 +13,7 @@ import EditCar from './components/CarViews/EditCar.jsx'
 import { Catalog } from './components/CarViews/catalog/Catalog.jsx'
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx'
 import { CarDetails } from './components/CarViews/details/CarDetails.jsx'
+import NotFound from './components/NotFound.jsx'
 function App() {
   const [authData, setAuthData] = usePersistedState('auth', {})
 
@@ -41,6 +42,7 @@ function App() {
         <Route path='/cars/:id' element={<CarDetails />} />
         <Route path='/cars/:id/edit' element={<EditCar />} />
         </Route>
+        <Route path='*' element={<NotFound />} />
       </Routes>
     </UserProvider>
   )

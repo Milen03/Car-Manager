@@ -64,6 +64,8 @@ export default function EditCar() {
                     name="year"
                     placeholder="Година"
                     defaultValue={car.year}
+                    min="1886"
+                    max={new Date().getFullYear()}
                     required
                     className="w-full px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/60 focus:border-yellow-500 transition-colors"
                 />
@@ -80,6 +82,7 @@ export default function EditCar() {
                     name="mileage"
                     placeholder="Пробег (км)"
                     defaultValue={car.mileage}
+                    min="0"
                     required
                     className="w-full px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/60 focus:border-yellow-500 transition-colors"
                 />

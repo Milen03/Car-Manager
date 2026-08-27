@@ -1,15 +1,26 @@
 const Service = require('../models').serviceModel;
 const Car = require('../models').carModel;
 
+const dateBasedTypes = ['Vignette', 'Tires'];
+
 const createService = async (req, res)  => {
     const { carId } = req.params;
-    const { type, mileagesAtService, changeEveryKm, notes } = req.body;
+    const { type, mileagesAtService, changeEveryKm, date, notes } = req.body;
     try {
+        if (dateBasedTypes.includes(type)) {
+            if (!date) {
+                return res.status(400).json({ error: 'Date is required for this service type' });
+            }
+        } else if (!mileagesAtService || !changeEveryKm) {
+            return res.status(400).json({ error: 'Mileage fields are required for this service type' });
+        }
+
         const newService = await Service.create({
             car: carId,
             type,
-            mileagesAtService,
-            changeEveryKm,
+            mileagesAtService: dateBasedTypes.includes(type) ? undefined : mileagesAtService,
+            changeEveryKm: dateBasedTypes.includes(type) ? undefined : changeEveryKm,
+            date: dateBasedTypes.includes(type) ? date : undefined,
             notes
         });
         if (!newService) {
@@ -36,13 +47,24 @@ const getServicesByCar = async (req, res) => {
 
 const editService = async (req, res) => {
     const { serviceId } = req.params;
-    const { type, mileagesAtService, changeEveryKm, notes } = req.body;
+    const { type, mileagesAtService, changeEveryKm, date, notes } = req.body;
     try {
+        if (dateBasedTypes.includes(type)) {
+            if (!date) {
+                return res.status(400).json({ error: 'Date is required for this service type' });
+            }
+        } else if (!mileagesAtService || !changeEveryKm) {
+            return res.status(400).json({ error: 'Mileage fields are required for this service type' });
+        }
+
+        const isDateBased = dateBasedTypes.includes(type);
         const updatedService = await Service.findByIdAndUpdate(serviceId, {
-            type,
-            mileagesAtService,
-            changeEveryKm,
-            notes
+            $set: {
+                type,
+                notes,
+                ...(isDateBased ? { date } : { mileagesAtService, changeEveryKm })
+            },
+            $unset: isDateBased ? { mileagesAtService: '', changeEveryKm: '' } : { date: '' }
         }, { new: true, runValidators: true });
         if (!updatedService) {
             return res.status(404).json({ error: 'Service not found' });

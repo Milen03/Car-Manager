@@ -11,12 +11,13 @@ const serviceSchema = new mongoose.Schema({
         enum: ['Oil', 'Air Filter', 'Tires', 'Vignette','Brake-Pads', 'other']
     },
     mileagesAtService:{
-        type: Number,
-        required: true
+        type: Number
     },
     changeEveryKm:{
-        type: Number,
-        required: true
+        type: Number
+    },
+    date:{
+        type: Date
     },
     notes:{
         type: String

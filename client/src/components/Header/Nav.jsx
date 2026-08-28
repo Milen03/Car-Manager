@@ -32,8 +32,12 @@ export default function Nav() {
     return (
         <header className="fixed inset-x-0 top-0 z-20">
             <nav className="flex items-center justify-between px-6 py-4 lg:px-12 bg-gray-950/70 backdrop-blur border-b border-gray-800">
-                <Link to="/" className="text-lg font-bold tracking-tight text-yellow-400">
-                    Car Manager
+                <Link to="/" aria-label="Начало" className="shrink-0">
+                    <img
+                        src="/Car-Managers-LOGO.png"
+                        alt="Car Manager"
+                        className="h-16 w-auto object-contain"
+                    />
                 </Link>
 
                 <button
@@ -86,7 +90,13 @@ export default function Nav() {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between">
-                            <span className="text-lg font-bold text-yellow-400">Car Manager</span>
+                            <Link to="/" aria-label="Начало" onClick={() => setMobileMenuOpen(false)}>
+                                <img
+                                    src="/Car-Managers-LOGO.png"
+                                    alt="Car Manager"
+                                    className="h-16 w-auto object-contain"
+                                />
+                            </Link>
                             <button
                                 type="button"
                                 onClick={() => setMobileMenuOpen(false)}

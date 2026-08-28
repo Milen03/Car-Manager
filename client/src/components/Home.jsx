@@ -12,9 +12,12 @@ export function Home() {
 
 
             <div className="relative text-center space-y-6 max-w-xl">
-                <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-yellow-400 opacity-0 [animation:fadeUp_0.6s_ease-out_forwards]">
-                    Car Manager
-                </h1>
+                <img
+                    src="/Car-Managers-LOGO.png"
+                    alt="Car Manager"
+                    className="mx-auto h-52 w-auto object-contain opacity-0 [animation:fadeUp_0.6s_ease-out_forwards] drop-shadow-[0_0_18px_rgba(250,204,21,0.45)]"
+                />
+               
                 <p className="text-gray-400 text-lg opacity-0 [animation:fadeUp_0.6s_ease-out_0.2s_forwards]">
                     Управлявай своите коли лесно и бързо на едно място.
                 </p>

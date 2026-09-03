@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import request from '../utils/request';
-import { userContext } from '../contexts/UserContext.jsx';
+import { userContext } from '../contexts/userContext.js';
 const baseUrl = 'http://localhost:3000/api';
 
 export const useRegister = () => {

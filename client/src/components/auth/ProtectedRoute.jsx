@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import { Navigate, Outlet } from 'react-router'
-import { userContext } from '../../contexts/UserContext.jsx'
+import { userContext } from '../../contexts/userContext.js'
 
 export default function ProtectedRoute() {
     const { username } = useContext(userContext)

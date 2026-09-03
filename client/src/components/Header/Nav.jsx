@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { userContext } from '../../contexts/UserContext.jsx'
+import { userContext } from '../../contexts/userContext.js'
 import { useLogout } from '../../api/auth.js'
 
 export default function Nav() {

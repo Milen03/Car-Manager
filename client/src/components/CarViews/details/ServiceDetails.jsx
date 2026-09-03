@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useServicesByCar, createService, deleteService, editService } from '../../../api/service.js';
 
 const serviceTypeLabels = {
@@ -120,14 +121,13 @@ export function ServiceDetails({ carId }) {
                             <option key={value} value={value}>{label}</option>
                         ))}
                     </select>
-                    {dateBasedTypes.includes(formType) ? (
-                        <input
-                            type="date"
-                            name="date"
-                            required
-                            className="w-full px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/60 focus:border-yellow-500 transition-colors"
-                        />
-                    ) : (
+                    <input
+                        type="date"
+                        name="date"
+                        required
+                        className="w-full px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/60 focus:border-yellow-500 transition-colors"
+                    />
+                    {!dateBasedTypes.includes(formType) && (
                         <>
                             <input
                                 type="number"
@@ -190,15 +190,14 @@ export function ServiceDetails({ carId }) {
                                             <option key={value} value={value}>{label}</option>
                                         ))}
                                     </select>
-                                    {dateBasedTypes.includes(editType) ? (
-                                        <input
-                                            type="date"
-                                            name="date"
-                                            defaultValue={service.date ? service.date.slice(0, 10) : ''}
-                                            required
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/60 focus:border-yellow-500 transition-colors"
-                                        />
-                                    ) : (
+                                    <input
+                                        type="date"
+                                        name="date"
+                                        defaultValue={service.date ? service.date.slice(0, 10) : ''}
+                                        required
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/60 focus:border-yellow-500 transition-colors"
+                                    />
+                                    {!dateBasedTypes.includes(editType) && (
                                         <>
                                             <input
                                                 type="number"
@@ -252,9 +251,10 @@ export function ServiceDetails({ carId }) {
                                         <p className="font-semibold text-gray-100">
                                             {serviceTypeLabels[service.type] ?? service.type}
                                         </p>
-                                        {dateBasedTypes.includes(service.type) ? (
-                                            <p className="text-sm text-gray-400">Купена/сменена на {new Date(service.date).toLocaleDateString('bg-BG')}</p>
-                                        ) : (
+                                        <p className="text-sm text-gray-400">
+                                            Сменена на {service.date ? new Date(service.date).toLocaleDateString('bg-BG') : 'няма дата'}
+                                        </p>
+                                        {!dateBasedTypes.includes(service.type) && (
                                             <p className="text-sm text-gray-400">При {service.mileagesAtService} км, смяна на всеки {service.changeEveryKm} км</p>
                                         )}
                                         {service.notes && (
@@ -290,4 +290,8 @@ export function ServiceDetails({ carId }) {
             )}
         </section>
     )
+}
+
+ServiceDetails.propTypes = {
+    carId: PropTypes.string.isRequired,
 }

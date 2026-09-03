@@ -1,4 +1,5 @@
 import { Link } from 'react-router'
+import PropTypes from 'prop-types'
 
 export default function CatalogItem({
     _id,
@@ -38,4 +39,13 @@ export default function CatalogItem({
             </Link>
         </div>
     )
+}
+
+CatalogItem.propTypes = {
+    _id: PropTypes.string.isRequired,
+    brand: PropTypes.string.isRequired,
+    model: PropTypes.string.isRequired,
+    year: PropTypes.number.isRequired,
+    mileage: PropTypes.number.isRequired,
+    registrationNumber: PropTypes.string.isRequired,
 }

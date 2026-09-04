@@ -15,7 +15,13 @@ dbConnector()
     require('./config/express')(app);
 
     app.use(cors({
-      origin: config.origin,
+      origin: (origin, callback) => {
+        if (!origin || config.origin.includes(origin)) {
+          callback(null, true);
+          return;
+        }
+        callback(new Error('Origin not allowed by CORS'));
+      },
       credentials: true
     }));
 
@@ -23,6 +29,14 @@ dbConnector()
 
     app.use(errorHandler);
 
-    app.listen(config.port, console.log(`Listening on port ${config.port}!`));
+    const server = app.listen(config.port, () => console.log(`Listening on port ${config.port}!`));
+
+    const shutdown = async () => {
+      server.close();
+      process.exit(0);
+    };
+
+    process.once('SIGTERM', shutdown);
+    process.once('SIGINT', shutdown);
   })
   .catch(console.error);

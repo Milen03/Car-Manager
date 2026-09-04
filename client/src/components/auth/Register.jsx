@@ -17,11 +17,13 @@ export default function Register() {
         }
         
 
-        const result = await register(data.username, data.email, data.password)
+        const result = await register(data.username, data.email, data.password, data.repeatPassword)
 
         console.log(result)
         
-       navigate('/')
+        if (!result) return
+
+        navigate('/')
 
         return result
 

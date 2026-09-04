@@ -1,18 +1,18 @@
 import { useContext } from 'react';
 import request from '../utils/request';
 import { userContext } from '../contexts/userContext.js';
-const baseUrl = 'http://localhost:3000/api';
+const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 export const useRegister = () => {
     const { userLoginHandeler } = useContext(userContext)
 
-    const register = async (username, email, password) => {
+    const register = async (username, email, password, repeatPassword) => {
         try {
-            const result = await request.post(`${baseUrl}/register`, { username, email, password })
+            const result = await request.post(`${baseUrl}/register`, { username, email, password, repeatPassword })
             userLoginHandeler(result)
             return result
         } catch (error) {
-            alert("Registration failed: " + error.message);
+            alert("Registration failed: " + (error.message || 'Please check your details.'));
         }
     }
 

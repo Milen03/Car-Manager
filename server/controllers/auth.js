@@ -15,6 +15,10 @@ const removePassword = (data) => {
 function register(req, res, next) {
     const { email, username, password, repeatPassword } = req.body;
 
+    if (password !== repeatPassword) {
+        return res.status(400).send({ message: 'Passwords do not match' });
+    }
+
     return userModel.create({ email, username, password })
         .then((createdUser) => {
             createdUser = bsonToJson(createdUser);
@@ -30,13 +34,14 @@ function register(req, res, next) {
                 .send(createdUser);
         })
         .catch(err => {
-            if (err.name === 'MongoError' && err.code === 11000) {
-                let field = err.message.split("index: ")[1];
-                field = field.split(" dup key")[0];
-                field = field.substring(0, field.lastIndexOf("_"));
-
+            if (err.code === 11000) {
+                const field = Object.keys(err.keyPattern || {})[0] || 'email or username';
                 res.status(409)
                     .send({ message: `This ${field} is already registered!` });
+                return;
+            }
+            if (err.name === 'ValidationError') {
+                res.status(400).send({ message: err.message });
                 return;
             }
             next(err);

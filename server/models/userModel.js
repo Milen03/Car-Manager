@@ -54,23 +54,11 @@ userSchema.methods = {
     }
 }
 
-userSchema.pre('save', function (next) {
+userSchema.pre('save', async function () {
     if (this.isModified('password')) {
-        bcrypt.genSalt(saltRounds, (err, salt) => {
-            if (err) {
-                next(err);
-            }
-            bcrypt.hash(this.password, salt, (err, hash) => {
-                if (err) {
-                    return next(err);
-                }
-                this.password = hash;
-                next();
-            })
-        })
-        return;
+        const salt = await bcrypt.genSalt(saltRounds);
+        this.password = await bcrypt.hash(this.password, salt);
     }
-    next();
 });
 
 module.exports = mongoose.model('User', userSchema);

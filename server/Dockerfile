@@ -2,7 +2,7 @@ FROM node:22
 
 ENV PORT=8080
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY . .
 

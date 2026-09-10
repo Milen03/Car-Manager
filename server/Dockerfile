@@ -1,17 +1,13 @@
-FROM node:22-slim
+FROM node:22
 
-WORKDIR /app
+ENV PORT=8080
 
-COPY package*.json ./
-RUN npm ci --omit=dev
+WORKDIR /usr/src/app
 
 COPY . .
-RUN chown -R node:node /app
 
-USER node
+RUN npm ci --omit=dev
 
-ENV NODE_ENV=production
-ENV PORT=8080
 EXPOSE 8080
 
 CMD ["npm", "start"]

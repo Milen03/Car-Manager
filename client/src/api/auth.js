@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import request from '../utils/request';
 import { userContext } from '../contexts/userContext.js';
-const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+import { baseUrl } from './config.js';
 
 export const useRegister = () => {
     const { userLoginHandeler } = useContext(userContext)

@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import request from '../utils/request.js';
-
-
-const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+import { baseUrl } from './config.js';
 
 export const useCreateCar = () => {
    

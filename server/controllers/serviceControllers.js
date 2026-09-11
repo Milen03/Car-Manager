@@ -1,5 +1,6 @@
 const Service = require('../models').serviceModel;
 const Car = require('../models').carModel;
+const { validateServiceMileage } = require('../utils/serviceValidation');
 
 const dateBasedTypes = ['Vignette', 'Tires'];
 
@@ -17,6 +18,12 @@ const createService = async (req, res)  => {
         }
         if (!dateBasedTypes.includes(type) && (!mileagesAtService || !changeEveryKm)) {
             return res.status(400).json({ error: 'Mileage fields are required for this service type' });
+        }
+        if (!dateBasedTypes.includes(type)) {
+            const mileageError = validateServiceMileage(car.mileage, mileagesAtService);
+            if (mileageError) {
+                return res.status(400).json({ error: mileageError });
+            }
         }
 
         const newService = await Service.create({
@@ -73,6 +80,12 @@ const editService = async (req, res) => {
         }
         if (!dateBasedTypes.includes(type) && (!mileagesAtService || !changeEveryKm)) {
             return res.status(400).json({ error: 'Mileage fields are required for this service type' });
+        }
+        if (!dateBasedTypes.includes(type)) {
+            const mileageError = validateServiceMileage(car.mileage, mileagesAtService);
+            if (mileageError) {
+                return res.status(400).json({ error: mileageError });
+            }
         }
 
         const updatedService = await Service.findByIdAndUpdate(serviceId, {

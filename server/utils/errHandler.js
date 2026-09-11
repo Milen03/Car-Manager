@@ -1,4 +1,18 @@
 function errorHandler(err, req, res, next) {
+    const databaseErrorNames = [
+        'MongoServerError',
+        'MongoServerSelectionError',
+        'MongoNetworkError',
+        'MongoParseError',
+    ];
+
+    if (databaseErrorNames.includes(err.name) || ['ECONNREFUSED', 'ENOTFOUND'].includes(err.code)) {
+        console.error(err);
+        res.status(503)
+            .json({ message: 'Database is unavailable' });
+        return;
+    }
+
     if (err.status === 333) {
         res.status(333)
             .json({ message: 'ErrorHandler: not allowed!' })

@@ -33,6 +33,20 @@ step() { printf '\n\033[1;33m==> %s\033[0m\n' "$*"; }
 warn() { printf '\033[1;31m!!  %s\033[0m\n' "$*"; }
 trap 'warn "Stopped at line $LINENO: $BASH_COMMAND"' ERR
 
+# Questions read only fresh keyboard input. Anything already waiting (for example
+# the next lines of a multi-line paste) is discarded first, so it cannot answer them.
+drain_typeahead() {
+  if [ -t 0 ]; then
+    while read -r -t 0 2>/dev/null; do read -r -t 1 _ || break; done
+  fi
+}
+# End of input (Ctrl+D) stops the script instead of re-asking forever.
+ask() { local reply; drain_typeahead; read -rp "$1" reply || exit 1; printf '%s' "$reply"; }
+ask_hidden() { local reply; drain_typeahead; read -rsp "$1" reply || exit 1; echo >&2; printf '%s' "$reply"; }
+
+# mongodb+srv://user:pass@cluster0.abcde.mongodb.net/db?opts -> cluster0.abcde.mongodb.net
+mongo_host() { local rest="${1#*://}"; rest="${rest##*@}"; printf '%s' "${rest%%[/?]*}"; }
+
 secret_exists() { gcloud secrets describe "$1" --project "$PROJECT_ID" >/dev/null 2>&1; }
 
 create_secret() {
@@ -113,24 +127,30 @@ else
     db_url="$(existing_service_env DB_URL_CREDENTIALS)"
     [ -n "$db_url" ] || db_url="$(existing_service_env DB_URL)"
     if [ -n "$db_url" ]; then
-      read -rp "Reuse the MongoDB connection string from the current Cloud Run service? [Y/n] " answer
-      case "$answer" in [nN]*) db_url="" ;; esac
+      echo "The current Cloud Run service points at MongoDB host: $(mongo_host "$db_url")"
+      case "$(ask "Reuse that connection string? [Y/n] ")" in [nN]*) db_url="" ;; esac
     fi
   fi
-  while [[ ! "$db_url" =~ ^mongodb(\+srv)?:// ]]; do
-    [ -z "$db_url" ] || warn "That does not look like a MongoDB connection string."
-    echo "Paste the MongoDB connection string from Atlas (mongodb+srv://...) and press Enter."
-    read -rsp "The input is hidden, like a password: " db_url
-    echo
-  done
 
-  echo "Checking that the database is reachable..."
-  if ! check_mongo "$db_url"; then
-    warn "Could not connect. In MongoDB Atlas check that the cluster is not paused and that"
-    warn "Network Access allows 0.0.0.0/0 (Cloud Run has no fixed outbound IP)."
-    read -rp "Store this connection string anyway? [y/N] " answer
-    case "$answer" in [yY]*) ;; *) exit 1 ;; esac
-  fi
+  while true; do
+    while [[ ! "$db_url" =~ ^mongodb(\+srv)?:// ]]; do
+      [ -z "$db_url" ] || warn "That does not look like a MongoDB connection string."
+      echo "Paste the MongoDB connection string from Atlas (Connect -> Drivers, mongodb+srv://...) and press Enter."
+      db_url="$(ask_hidden "The input is hidden, like a password: ")"
+    done
+
+    echo "Checking that $(mongo_host "$db_url") is reachable..."
+    if check_mongo "$db_url"; then
+      break
+    fi
+    warn "Could not connect. In MongoDB Atlas check that the cluster exists and is not paused,"
+    warn "that the password in the string is right, and that Network Access allows 0.0.0.0/0."
+    case "$(ask "Enter a different connection string? [Y/n] ")" in
+      [nN]*)
+        case "$(ask "Store this one anyway? [y/N] ")" in [yY]*) break ;; *) exit 1 ;; esac ;;
+      *) db_url="" ;;
+    esac
+  done
   create_secret DB_URL "$db_url"
 fi
 

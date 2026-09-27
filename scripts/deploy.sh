@@ -90,6 +90,15 @@ smoke_test() {
   rm -f "$body"
 }
 
+# setup-gcp.sh creates these; without them the new revision cannot start.
+# (Skipped in CI, whose deploy-only service account cannot read secret metadata.)
+if [ "$TARGET" != "client" ] && [ -z "${CI:-}" ]; then
+  for name in DB_URL JWT_SECRET COOKIE_SECRET; do
+    gcloud secrets describe "$name" --project "$PROJECT_ID" >/dev/null 2>&1 \
+      || fail "Secret $name does not exist. Run ./scripts/setup-gcp.sh first and let it finish with 'Setup complete'."
+  done
+fi
+
 [ "$TARGET" = "client" ] || deploy_server
 [ "$TARGET" = "server" ] || deploy_client
 smoke_test

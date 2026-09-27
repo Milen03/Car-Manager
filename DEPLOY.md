@@ -54,6 +54,9 @@ git clone https://github.com/Milen03/Car-Manager.git && cd Car-Manager
 ./scripts/deploy.sh        # build, deploy, and check the live site
 ```
 
+Run the lines one at a time: `setup-gcp.sh` asks questions, and pasting all
+three lines at once used to feed the next line in as an answer.
+
 `setup-gcp.sh` asks for the MongoDB connection string (or offers to reuse the
 one from the existing service), tests that it connects, and stores it in Secret
 Manager next to two generated signing secrets. Nothing secret goes into the repo

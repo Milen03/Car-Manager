@@ -42,7 +42,30 @@ drain_typeahead() {
 }
 # End of input (Ctrl+D) stops the script instead of re-asking forever.
 ask() { local reply; drain_typeahead; read -rp "$1" reply || exit 1; printf '%s' "$reply"; }
-ask_hidden() { local reply; drain_typeahead; read -rsp "$1" reply || exit 1; echo >&2; printf '%s' "$reply"; }
+
+# Reads the connection string with visible, editable input, so a paste that went
+# wrong can be seen and fixed. Pulls the mongodb:// or mongodb+srv:// address out
+# of whatever was pasted (a whole code line from Atlas, quotes, stray spaces).
+# Prints nothing if the input does not contain a usable string, after saying why.
+ask_connection_string() {
+  local reply url
+  drain_typeahead
+  read -erp "Connection string: " reply || exit 1
+  if [[ "$reply" =~ (mongodb(\+srv)?://[^[:space:][:cntrl:]\"\'\`\;]+) ]]; then
+    url="${BASH_REMATCH[1]}"
+  fi
+  if [ -z "$reply" ]; then
+    warn >&2 "Nothing was received. Paste with Ctrl+V or right-click -> Paste; the text should appear on the line."
+  elif [ -z "${url:-}" ]; then
+    warn >&2 "That does not contain a mongodb+srv:// address. Copy the line that starts with mongodb+srv:// from Atlas."
+  elif [[ "$url" == *"<"*">"* ]]; then
+    warn >&2 "The string still contains a placeholder such as <db_password>. Replace it, including the < >, with the database user's password."
+  elif [[ "$url" != *@* ]]; then
+    warn >&2 "The string has no user:password@ part. Copy it again from Atlas -> Connect -> Drivers."
+  else
+    printf '%s' "$url"
+  fi
+}
 
 # mongodb+srv://user:pass@cluster0.abcde.mongodb.net/db?opts -> cluster0.abcde.mongodb.net
 mongo_host() { local rest="${1#*://}"; rest="${rest##*@}"; printf '%s' "${rest%%[/?]*}"; }
@@ -133,10 +156,11 @@ else
   fi
 
   while true; do
-    while [[ ! "$db_url" =~ ^mongodb(\+srv)?:// ]]; do
-      [ -z "$db_url" ] || warn "That does not look like a MongoDB connection string."
-      echo "Paste the MongoDB connection string from Atlas (Connect -> Drivers, mongodb+srv://...) and press Enter."
-      db_url="$(ask_hidden "The input is hidden, like a password: ")"
+    while [ -z "$db_url" ]; do
+      echo
+      echo "Paste the MongoDB connection string from Atlas (Connect -> Drivers), then press Enter."
+      echo "It looks like: mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/?retryWrites=true..."
+      db_url="$(ask_connection_string)"
     done
 
     echo "Checking that $(mongo_host "$db_url") is reachable..."

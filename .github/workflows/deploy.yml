@@ -1,21 +1,23 @@
 name: Deploy
 
-# Manual deploys only. To deploy automatically on every push to main,
-# add a `push: { branches: [main] }` trigger below.
+# Manual deploys from Actions -> Deploy -> Run workflow. Runs the same
+# scripts/deploy.sh you would run in Cloud Shell. Needs one repository secret,
+# GCP_SERVICE_ACCOUNT; see DEPLOY.md.
 on:
   workflow_dispatch:
     inputs:
       target:
         description: What to deploy
         type: choice
-        default: both
-        options: [both, client, server]
+        default: all
+        options: [all, server, client]
 
-env:
-  FIREBASE_PROJECT: car-manager-508119
-  GCP_PROJECT: car-manager-508119
-  CLOUD_RUN_SERVICE: car-manager
-  CLOUD_RUN_REGION: europe-west4
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
 
 jobs:
   verify:
@@ -31,98 +33,38 @@ jobs:
             client/package-lock.json
             server/package-lock.json
 
-      - name: Install client dependencies
+      - name: Lint and build client
         working-directory: client
-        run: npm ci
-
-      - name: Lint client
-        working-directory: client
-        run: npm run lint
-
-      - name: Build client
-        working-directory: client
-        run: npm run build
-
-      - name: Install server dependencies
-        working-directory: server
-        run: npm ci
+        run: |
+          npm ci
+          npm run lint
+          npm run build
 
       - name: Test server
         working-directory: server
-        run: npm test
+        run: |
+          npm ci
+          npm test
 
-      - name: Upload client build
-        if: inputs.target != 'server'
-        uses: actions/upload-artifact@v4
-        with:
-          name: client-dist
-          path: client/dist
-          retention-days: 1
-
-  deploy-client:
+  deploy:
     needs: verify
-    if: inputs.target != 'server'
     runs-on: ubuntu-latest
-    environment: production
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download client build
-        uses: actions/download-artifact@v4
+      - uses: actions/setup-node@v4
         with:
-          name: client-dist
-          path: client/dist
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
 
-      - id: auth
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-
-      - name: Deploy to Firebase Hosting
-        working-directory: client
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
-        run: npx --yes firebase-tools@13 deploy --only hosting --project "$FIREBASE_PROJECT" --non-interactive
-
-  deploy-server:
-    needs: verify
-    if: inputs.target != 'client'
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-
+      # Exports GOOGLE_APPLICATION_CREDENTIALS, which both gcloud and the
+      # Firebase CLI pick up.
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - uses: google-github-actions/setup-gcloud@v2
 
-      - name: Deploy to Cloud Run
-        run: |
-          gcloud run deploy "$CLOUD_RUN_SERVICE" \
-            --source server \
-            --project "$GCP_PROJECT" \
-            --region "$CLOUD_RUN_REGION" \
-            --platform managed \
-            --allow-unauthenticated \
-            --set-env-vars "NODE_ENV=production,CLIENT_ORIGIN=${{ vars.CLIENT_ORIGIN }}" \
-            --set-secrets "DB_URL=DB_URL:latest,COOKIESECRET=COOKIESECRET:latest"
-
-      - name: Verify the API is healthy
-        run: |
-          url="$(gcloud run services describe "$CLOUD_RUN_SERVICE" \
-            --project "$GCP_PROJECT" --region "$CLOUD_RUN_REGION" \
-            --format 'value(status.url)')"
-          echo "Deployed to $url"
-          for attempt in 1 2 3 4 5; do
-            code="$(curl -sS -o /tmp/health.json -w '%{http_code}' "$url/api/test" || echo 000)"
-            echo "attempt $attempt: HTTP $code"
-            if [ "$code" = "200" ]; then
-              exit 0
-            fi
-            cat /tmp/health.json 2>/dev/null || true
-            sleep 10
-          done
-          echo "::error::API did not return 200 after deploy (last status $code)"
-          exit 1
+      - name: Deploy
+        run: ./scripts/deploy.sh "${{ inputs.target }}"

@@ -1,6 +1,8 @@
+export const UNAUTHORIZED_EVENT = 'auth:unauthorized'
+
 const request = async (method, url, data, options = {})=>{
 
-    options.credentials = 'include' // needed so the httpOnly auth cookie is sent/received cross-origin
+    options.credentials = 'same-origin' // the API is served from the same origin as the app
 
     if (method !== 'GET') {
         options.method = method
@@ -24,6 +26,12 @@ const request = async (method, url, data, options = {})=>{
     }
 
     if(!response.ok){
+        if (response.status === 401) {
+            // The server rejected the session cookie (expired, logged out elsewhere),
+            // so drop the stored user and let the protected routes redirect to login.
+            window.dispatchEvent(new Event(UNAUTHORIZED_EVENT))
+        }
+
         const result = await response.json()
 
         throw result

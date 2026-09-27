@@ -12,7 +12,7 @@ export default function Login() {
 
         const result = await login(data.email, data.password)
 
-        console.log(result)
+        if (!result) return
 
         navigate('/')
     }

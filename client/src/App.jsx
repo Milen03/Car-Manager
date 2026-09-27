@@ -14,8 +14,17 @@ import { Catalog } from './components/CarViews/catalog/Catalog.jsx'
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx'
 import { CarDetails } from './components/CarViews/details/CarDetails.jsx'
 import NotFound from './components/NotFound.jsx'
+import { useEffect } from 'react'
+import { UNAUTHORIZED_EVENT } from './utils/request.js'
 function App() {
   const [authData, setAuthData] = usePersistedState('auth', {})
+
+  useEffect(() => {
+    const clearAuthData = () => setAuthData({})
+
+    window.addEventListener(UNAUTHORIZED_EVENT, clearAuthData)
+    return () => window.removeEventListener(UNAUTHORIZED_EVENT, clearAuthData)
+  }, [setAuthData])
 
   const userLoginHandeler = (resultData) => {
     setAuthData(resultData)

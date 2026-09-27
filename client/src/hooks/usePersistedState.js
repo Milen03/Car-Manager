@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useCallback, useState } from "react"
 
 export default function usePersistedState(stateKey,initialState){
     const [state,setState] = useState(()=>{
@@ -12,12 +12,12 @@ export default function usePersistedState(stateKey,initialState){
         return persistentStatetData
     })
 
-    const setPersistentState = (data) =>{
+    const setPersistentState = useCallback((data) =>{
         const persistedData = JSON.stringify(data)
 
         localStorage.setItem(stateKey,persistedData)
         setState(data)
-    }
+    }, [stateKey])
 
 
     return [

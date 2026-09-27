@@ -2,7 +2,6 @@ global.__basedir = __dirname;
 require('dotenv').config()
 const apiRouter = require('./router');
 const cors = require('cors');
-const mongoose = require('mongoose');
 const { errorHandler } = require('./utils');
 const dbConnector = require('./config/db');
 const config = require('./config/config');
@@ -21,12 +20,13 @@ app.use(cors({
   credentials: true
 }));
 
+// On a cold start the request that woke the instance arrives before Mongo has
+// finished connecting, so wait for the connection rather than rejecting it.
 app.use('/api', (req, res, next) => {
-  if (mongoose.connection.readyState !== 1) {
+  dbConnector().then(() => next(), (error) => {
+    console.error('Database connection failed:', error.message);
     res.status(503).json({ message: 'Database is unavailable' });
-    return;
-  }
-  next();
+  });
 });
 
 app.use('/api', apiRouter);
@@ -51,6 +51,7 @@ const shutdown = async () => {
 process.once('SIGTERM', shutdown);
 process.once('SIGINT', shutdown);
 
+// Start connecting immediately so the first request usually finds it ready.
 dbConnector().catch((error) => {
-  console.error('Database connection failed:', error);
+  console.error('Database connection failed:', error.message);
 });

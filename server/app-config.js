@@ -2,10 +2,12 @@
 // forwards to Cloud Run, so the auth cookie must use exactly this name.
 const authCookieName = '__session';
 const isProduction = process.env.NODE_ENV === 'production';
-const cookieSecret = process.env.COOKIESECRET;
+// The app sets no signed cookies, so a separate secret adds nothing; fall back to
+// the JWT secret so production needs one secret instead of two.
+const cookieSecret = process.env.COOKIESECRET || process.env.SECRET;
 
 if (isProduction && (!cookieSecret || cookieSecret.length < 32)) {
-    throw new Error('COOKIESECRET must be set to at least 32 characters in production');
+    throw new Error('SECRET (or COOKIESECRET) must be set to at least 32 characters in production');
 }
 
 // The client and API share an origin (Hosting rewrites /api to Cloud Run), so the

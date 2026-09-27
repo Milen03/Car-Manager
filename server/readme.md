@@ -2,11 +2,13 @@
 
 ## Base URL
 
-Development: `http://localhost:3000/api`
+Production: `https://car-manager-508119.web.app/api` (same origin as the app)
+
+Development: `http://localhost:3000/api` (the Vite dev server proxies `/api` there)
 
 ## Authentication
 
-Authentication uses the `auth-cookie` HTTP-only cookie. Register or log in before using protected resources.
+Authentication uses the `__session` HTTP-only cookie (the only cookie name Firebase Hosting forwards to Cloud Run). Register or log in before using protected resources.
 
 ### Auth endpoints
 

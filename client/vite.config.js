@@ -5,4 +5,10 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(),tailwindcss()],
+  server: {
+    // Mirrors the Firebase Hosting rewrite so the auth cookie stays same-origin.
+    proxy: {
+      '/api': 'http://localhost:3000',
+    },
+  },
 })

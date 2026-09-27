@@ -25,15 +25,18 @@ export function ServiceDetails({ carId }) {
         setServices(fetchedServices);
     }, [fetchedServices]);
 
-    const validateServiceData = ({ type, mileagesAtService, changeEveryKm, date }) => {
+    const validateServiceData = ({ type, changeEveryKm, date }) => {
         if (dateBasedTypes.includes(type)) {
             if (!date) {
                 return 'Датата е задължителна за този вид работа.';
             }
             return null;
         }
-        if (Number(mileagesAtService) >= Number(changeEveryKm)) {
-            return 'Пробегът при извършване трябва да е по-малък от интервала за смяна.';
+        // changeEveryKm is an interval ("every 10 000 km"), not an odometer reading, so it
+        // is not comparable to mileagesAtService. The server checks that
+        // mileagesAtService is not below the car's mileage.
+        if (!(Number(changeEveryKm) > 0)) {
+            return 'Интервалът за смяна трябва да е положително число.';
         }
         return null;
     }

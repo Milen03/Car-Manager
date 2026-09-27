@@ -1,4 +1,6 @@
-const authCookieName = 'auth-cookie';
+// Firebase Hosting strips every cookie except `__session` from requests it
+// forwards to Cloud Run, so the auth cookie must use exactly this name.
+const authCookieName = '__session';
 const isProduction = process.env.NODE_ENV === 'production';
 const cookieSecret = process.env.COOKIESECRET;
 
@@ -6,8 +8,24 @@ if (isProduction && (!cookieSecret || cookieSecret.length < 32)) {
     throw new Error('COOKIESECRET must be set to at least 32 characters in production');
 }
 
+// The client and API share an origin (Hosting rewrites /api to Cloud Run), so the
+// cookie is first-party: Lax works in every browser, including Safari, and blocks
+// cross-site request forgery.
+const authCookieOptions = {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: isProduction,
+    path: '/',
+};
+
+// Matches the JWT lifetime in utils/jwt.js. Kept out of authCookieOptions because
+// res.clearCookie would otherwise honour it and never clear the cookie.
+const authCookieMaxAge = 24 * 60 * 60 * 1000;
+
 module.exports = {
     authCookieName,
+    authCookieOptions,
+    authCookieMaxAge,
     cookieSecret: cookieSecret || 'SoftUni-development-only',
     isProduction,
 }

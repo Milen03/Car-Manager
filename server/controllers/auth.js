@@ -4,13 +4,17 @@ const {
 } = require('../models');
 
 const utils = require('../utils');
-const { authCookieName } = require('../app-config');
+const { authCookieName, authCookieOptions, authCookieMaxAge } = require('../app-config');
 
 const bsonToJson = (data) => { return JSON.parse(JSON.stringify(data)) };
 const removePassword = (data) => {
     const { password, __v, ...userData } = data;
     return userData
 }
+
+const setAuthCookie = (res, token) => {
+    res.cookie(authCookieName, token, { ...authCookieOptions, maxAge: authCookieMaxAge });
+};
 
 function register(req, res, next) {
     const { email, username, password, repeatPassword } = req.body;
@@ -25,11 +29,7 @@ function register(req, res, next) {
             createdUser = removePassword(createdUser);
 
             const token = utils.jwt.createToken({ id: createdUser._id });
-            if (process.env.NODE_ENV === 'production') {
-                res.cookie(authCookieName, token, { httpOnly: true, sameSite: 'none', secure: true })
-            } else {
-                res.cookie(authCookieName, token, { httpOnly: true })
-            }
+            setAuthCookie(res, token);
             res.status(200)
                 .send(createdUser);
         })
@@ -65,28 +65,29 @@ function login(req, res, next) {
             user = removePassword(user);
 
             const token = utils.jwt.createToken({ id: user._id });
-
-            if (process.env.NODE_ENV === 'production') {
-                res.cookie(authCookieName, token, { httpOnly: true, sameSite: 'none', secure: true })
-            } else {
-                res.cookie(authCookieName, token, { httpOnly: true })
-            }
+            setAuthCookie(res, token);
             res.status(200)
                 .send(user);
         })
         .catch(next);
 }
 
-function logout(req, res) {
+function logout(req, res, next) {
     const token = req.cookies[authCookieName];
+
+    res.clearCookie(authCookieName, authCookieOptions);
+
+    if (!token) {
+        res.status(200).send({ message: 'Logged out!' });
+        return;
+    }
 
     tokenBlacklistModel.create({ token })
         .then(() => {
-            res.clearCookie(authCookieName)
-                .status(200)
+            res.status(200)
                 .send({ message: 'Logged out!' });
         })
-        .catch(err => res.send(err));
+        .catch(next);
 }
 
 function getProfileInfo(req, res, next) {

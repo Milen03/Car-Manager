@@ -16,8 +16,12 @@
 #   - lets the Cloud Run runtime read those secrets and lets Cloud Build build it
 #   - keeps only the two newest container images, so storage stays in the free tier
 #   - adds a budget alert that emails you if the project ever costs money
-set -euo pipefail
+set -eEuo pipefail
 cd "$(dirname "$0")/.."
+
+# gcloud must never stop to ask a question: several calls below hide its output,
+# so a prompt would be invisible and the script would look frozen.
+export CLOUDSDK_CORE_DISABLE_PROMPTS=1
 
 PROJECT_ID="${PROJECT_ID:-car-manager-508119}"
 REGION="${REGION:-europe-west4}"
@@ -27,6 +31,7 @@ IMAGE_REPO="cloud-run-source-deploy"
 
 step() { printf '\n\033[1;33m==> %s\033[0m\n' "$*"; }
 warn() { printf '\033[1;31m!!  %s\033[0m\n' "$*"; }
+trap 'warn "Stopped at line $LINENO: $BASH_COMMAND"' ERR
 
 secret_exists() { gcloud secrets describe "$1" --project "$PROJECT_ID" >/dev/null 2>&1; }
 
@@ -87,6 +92,17 @@ gcloud services enable \
   billingbudgets.googleapis.com \
   --project "$PROJECT_ID"
 
+# A freshly enabled API can take a minute before it answers.
+for attempt in $(seq 1 24); do
+  gcloud secrets list --project "$PROJECT_ID" --limit=1 >/dev/null 2>&1 && break
+  if [ "$attempt" = 24 ]; then
+    warn "Secret Manager is still not answering. Wait a minute and re-run this script."
+    exit 1
+  fi
+  [ "$attempt" = 1 ] && echo "Waiting for the APIs to become available..."
+  sleep 5
+done
+
 step "Secrets"
 if secret_exists DB_URL; then
   echo "DB_URL already stored, keeping it."
@@ -103,7 +119,8 @@ else
   fi
   while [[ ! "$db_url" =~ ^mongodb(\+srv)?:// ]]; do
     [ -z "$db_url" ] || warn "That does not look like a MongoDB connection string."
-    read -rsp "MongoDB connection string (mongodb+srv://user:pass@cluster/car-manager): " db_url
+    echo "Paste the MongoDB connection string from Atlas (mongodb+srv://...) and press Enter."
+    read -rsp "The input is hidden, like a password: " db_url
     echo
   done
 

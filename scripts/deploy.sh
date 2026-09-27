@@ -7,8 +7,11 @@
 #
 # The client is served by Firebase Hosting, which forwards /api/** to the Cloud Run
 # service, so the whole app lives on one origin: https://<project>.web.app
-set -euo pipefail
+set -eEuo pipefail
 cd "$(dirname "$0")/.."
+
+# gcloud must never stop to ask a question; fail instead so the error is visible.
+export CLOUDSDK_CORE_DISABLE_PROMPTS=1
 
 PROJECT_ID="${PROJECT_ID:-car-manager-508119}"
 REGION="${REGION:-europe-west4}"
@@ -19,6 +22,7 @@ TARGET="${1:-all}"
 
 step() { printf '\n\033[1;33m==> %s\033[0m\n' "$*"; }
 fail() { printf '\033[1;31m!!  %s\033[0m\n' "$*"; exit 1; }
+trap 'printf "\033[1;31m!!  Stopped at line %s: %s\033[0m\n" "$LINENO" "$BASH_COMMAND"' ERR
 
 case "$TARGET" in all|server|client) ;; *) fail "Unknown target '$TARGET'. Use all, server or client." ;; esac
 

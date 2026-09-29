@@ -6,8 +6,10 @@ Free, no credit card, and every push to `main` redeploys automatically. The
 client and the API run on one domain, so login works in every browser.
 
 **1. Import the project.** Sign in at [vercel.com](https://vercel.com) with
-GitHub, then **Add New → Project → Import** `Car-Manager`. Leave the build
-settings alone; `vercel.json` sets them. Under **Environment Variables** add:
+GitHub, then **Add New → Project → Import** `Car-Manager`. Keep **Root
+Directory** at the repository root (`./`), not `server` or `client`: the root
+`vercel.json` defines both services. Leave the build settings alone. Under
+**Environment Variables** add:
 
 | Name | Value |
 | --- | --- |
@@ -34,8 +36,14 @@ working. When the connection string names no database, the server uses
 
 ### How it fits together
 
-- `vercel.json` builds `client/` into static files and sends every `/api/*`
-  request to `api/index.js`, which serves the Express app from `server/app.js`.
+- `vercel.json` defines two [services](https://vercel.com/docs/services):
+  `client` (Vite, static) and `server` (Express, entrypoint `server/app.js`).
+  Public rewrites send `/api/*` to `server` and everything else to `client`,
+  which falls back to `index.html` for app routes. Services receive the original
+  path, so the Express routes stay under `/api`. The browser is the only caller
+  of the API, so the services need no bindings.
+- Vercel deployments run in production mode even without `NODE_ENV`
+  (`server/config/env.js`).
 - Only `SECRET` and `MONGODB_URI` (or `DB_URL`) are required in production.
   `CLIENT_ORIGIN` is only needed if another origin must call the API, and
   `COOKIESECRET` falls back to `SECRET`.

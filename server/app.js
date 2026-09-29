@@ -1,7 +1,9 @@
 // The Express app, without starting a server. index.js listens on a port for
-// local development and Cloud Run; api/index.js hands it to Vercel as a function.
+// local development and Cloud Run; on Vercel the `server` service uses this file
+// as its entrypoint (see vercel.json).
 global.__basedir = global.__basedir || __dirname;
 require('dotenv').config();
+
 const apiRouter = require('./router');
 const cors = require('cors');
 const { errorHandler } = require('./utils');

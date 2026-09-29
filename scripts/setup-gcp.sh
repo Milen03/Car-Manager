@@ -16,8 +16,12 @@
 #   - lets the Cloud Run runtime read those secrets and lets Cloud Build build it
 #   - keeps only the two newest container images, so storage stays in the free tier
 #   - adds a budget alert that emails you if the project ever costs money
-set -euo pipefail
+set -eEuo pipefail
 cd "$(dirname "$0")/.."
+
+# gcloud must never stop to ask a question: several calls below hide its output,
+# so a prompt would be invisible and the script would look frozen.
+export CLOUDSDK_CORE_DISABLE_PROMPTS=1
 
 PROJECT_ID="${PROJECT_ID:-car-manager-508119}"
 REGION="${REGION:-europe-west4}"
@@ -27,6 +31,44 @@ IMAGE_REPO="cloud-run-source-deploy"
 
 step() { printf '\n\033[1;33m==> %s\033[0m\n' "$*"; }
 warn() { printf '\033[1;31m!!  %s\033[0m\n' "$*"; }
+trap 'warn "Stopped at line $LINENO: $BASH_COMMAND"' ERR
+
+# Questions read only fresh keyboard input. Anything already waiting (for example
+# the next lines of a multi-line paste) is discarded first, so it cannot answer them.
+drain_typeahead() {
+  if [ -t 0 ]; then
+    while read -r -t 0 2>/dev/null; do read -r -t 1 _ || break; done
+  fi
+}
+# End of input (Ctrl+D) stops the script instead of re-asking forever.
+ask() { local reply; drain_typeahead; read -rp "$1" reply || exit 1; printf '%s' "$reply"; }
+
+# Reads the connection string with visible, editable input, so a paste that went
+# wrong can be seen and fixed. Pulls the mongodb:// or mongodb+srv:// address out
+# of whatever was pasted (a whole code line from Atlas, quotes, stray spaces).
+# Prints nothing if the input does not contain a usable string, after saying why.
+ask_connection_string() {
+  local reply url
+  drain_typeahead
+  read -erp "Connection string: " reply || exit 1
+  if [[ "$reply" =~ (mongodb(\+srv)?://[^[:space:][:cntrl:]\"\'\`\;]+) ]]; then
+    url="${BASH_REMATCH[1]}"
+  fi
+  if [ -z "$reply" ]; then
+    warn >&2 "Nothing was received. Paste with Ctrl+V or right-click -> Paste; the text should appear on the line."
+  elif [ -z "${url:-}" ]; then
+    warn >&2 "That does not contain a mongodb+srv:// address. Copy the line that starts with mongodb+srv:// from Atlas."
+  elif [[ "$url" == *"<"*">"* ]]; then
+    warn >&2 "The string still contains a placeholder such as <db_password>. Replace it, including the < >, with the database user's password."
+  elif [[ "$url" != *@* ]]; then
+    warn >&2 "The string has no user:password@ part. Copy it again from Atlas -> Connect -> Drivers."
+  else
+    printf '%s' "$url"
+  fi
+}
+
+# mongodb+srv://user:pass@cluster0.abcde.mongodb.net/db?opts -> cluster0.abcde.mongodb.net
+mongo_host() { local rest="${1#*://}"; rest="${rest##*@}"; printf '%s' "${rest%%[/?]*}"; }
 
 secret_exists() { gcloud secrets describe "$1" --project "$PROJECT_ID" >/dev/null 2>&1; }
 
@@ -87,6 +129,17 @@ gcloud services enable \
   billingbudgets.googleapis.com \
   --project "$PROJECT_ID"
 
+# A freshly enabled API can take a minute before it answers.
+for attempt in $(seq 1 24); do
+  gcloud secrets list --project "$PROJECT_ID" --limit=1 >/dev/null 2>&1 && break
+  if [ "$attempt" = 24 ]; then
+    warn "Secret Manager is still not answering. Wait a minute and re-run this script."
+    exit 1
+  fi
+  [ "$attempt" = 1 ] && echo "Waiting for the APIs to become available..."
+  sleep 5
+done
+
 step "Secrets"
 if secret_exists DB_URL; then
   echo "DB_URL already stored, keeping it."
@@ -97,23 +150,31 @@ else
     db_url="$(existing_service_env DB_URL_CREDENTIALS)"
     [ -n "$db_url" ] || db_url="$(existing_service_env DB_URL)"
     if [ -n "$db_url" ]; then
-      read -rp "Reuse the MongoDB connection string from the current Cloud Run service? [Y/n] " answer
-      case "$answer" in [nN]*) db_url="" ;; esac
+      echo "The current Cloud Run service points at MongoDB host: $(mongo_host "$db_url")"
+      case "$(ask "Reuse that connection string? [Y/n] ")" in [nN]*) db_url="" ;; esac
     fi
   fi
-  while [[ ! "$db_url" =~ ^mongodb(\+srv)?:// ]]; do
-    [ -z "$db_url" ] || warn "That does not look like a MongoDB connection string."
-    read -rsp "MongoDB connection string (mongodb+srv://user:pass@cluster/car-manager): " db_url
-    echo
-  done
 
-  echo "Checking that the database is reachable..."
-  if ! check_mongo "$db_url"; then
-    warn "Could not connect. In MongoDB Atlas check that the cluster is not paused and that"
-    warn "Network Access allows 0.0.0.0/0 (Cloud Run has no fixed outbound IP)."
-    read -rp "Store this connection string anyway? [y/N] " answer
-    case "$answer" in [yY]*) ;; *) exit 1 ;; esac
-  fi
+  while true; do
+    while [ -z "$db_url" ]; do
+      echo
+      echo "Paste the MongoDB connection string from Atlas (Connect -> Drivers), then press Enter."
+      echo "It looks like: mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/?retryWrites=true..."
+      db_url="$(ask_connection_string)"
+    done
+
+    echo "Checking that $(mongo_host "$db_url") is reachable..."
+    if check_mongo "$db_url"; then
+      break
+    fi
+    warn "Could not connect. In MongoDB Atlas check that the cluster exists and is not paused,"
+    warn "that the password in the string is right, and that Network Access allows 0.0.0.0/0."
+    case "$(ask "Enter a different connection string? [Y/n] ")" in
+      [nN]*)
+        case "$(ask "Store this one anyway? [y/N] ")" in [yY]*) break ;; *) exit 1 ;; esac ;;
+      *) db_url="" ;;
+    esac
+  done
   create_secret DB_URL "$db_url"
 fi
 

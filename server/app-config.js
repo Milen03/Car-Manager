@@ -1,7 +1,7 @@
 // Firebase Hosting strips every cookie except `__session` from requests it
 // forwards to Cloud Run, so the auth cookie must use exactly this name.
 const authCookieName = '__session';
-const isProduction = process.env.NODE_ENV === 'production';
+const { isProduction } = require('./config/env');
 // The app sets no signed cookies, so a separate secret adds nothing; fall back to
 // the JWT secret so production needs one secret instead of two.
 const cookieSecret = process.env.COOKIESECRET || process.env.SECRET;

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const isProduction = process.env.NODE_ENV === 'production';
+const { isProduction } = require('../config/env');
 const secret = process.env.SECRET;
 
 if (isProduction && (!secret || secret.length < 32)) {

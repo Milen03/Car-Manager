@@ -1,4 +1,4 @@
-const env = process.env.NODE_ENV || 'development';
+const { env } = require('./env');
 
 const config = {
     development: {

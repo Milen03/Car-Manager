@@ -8,8 +8,8 @@ const config = {
     },
     production: {
         port: process.env.PORT || 3000,
-        // MONGODB_URI is what the Vercel MongoDB Atlas integration sets.
-        dbURL: process.env.DB_URL_CREDENTIALS || process.env.DB_URL || process.env.MONGODB_URI,
+        // MONGO_URL is the name Railway's MongoDB service uses.
+        dbURL: process.env.DB_URL || process.env.MONGO_URL || process.env.MONGODB_URI,
         origin: (process.env.CLIENT_ORIGIN || '').split(',').map(origin => origin.trim()).filter(Boolean)
     }
 };
@@ -17,7 +17,7 @@ const config = {
 const selectedConfig = config[env];
 
 if (env === 'production' && !selectedConfig.dbURL) {
-    throw new Error('DB_URL or MONGODB_URI must be configured in production');
+    throw new Error('DB_URL (or MONGO_URL) must be configured in production');
 }
 
 module.exports = selectedConfig;

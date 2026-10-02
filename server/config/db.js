@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 
 let connecting = null;
 
-// Connection strings copied from Atlas (or set by the Vercel integration) often
-// have no database in the path, which would make Mongo use "test". Default to the
-// same database name as local development so migrated data is found.
+// Connection strings from Railway and Atlas usually have no database in the path,
+// which would make Mongo use "test". Default to the same database name as local
+// development so migrated data is found.
 const defaultDbName = 'Car-Manager';
 const hasDatabaseInPath = (url) => /^mongodb(?:\+srv)?:\/\/[^/]+\/[^?/]+/.test(url || '');
 

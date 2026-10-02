@@ -1,6 +1,4 @@
-// The Express app, without starting a server. index.js listens on a port for
-// local development and Cloud Run; on Vercel the `server` service uses this file
-// as its entrypoint (see vercel.json).
+// The Express app, without starting a server; index.js listens on a port.
 global.__basedir = global.__basedir || __dirname;
 require('dotenv').config();
 
@@ -13,9 +11,9 @@ const config = require('./config/config');
 const app = require('express')();
 require('./config/express')(app);
 
-// The client is served from the same origin as the API, and same-origin requests
-// need no CORS headers. Other origins only get them if listed in CLIENT_ORIGIN;
-// anything else is left without CORS headers (so the browser blocks it) rather
+// The browser reaches the API through Vercel's /api rewrite, i.e. from the same
+// origin as the client, and same-origin requests need no CORS headers. Other
+// origins only get them if listed in CLIENT_ORIGIN; anything else is left without CORS headers (so the browser blocks it) rather
 // than failing with a server error.
 app.use(cors({
   origin: (origin, callback) => {
@@ -24,7 +22,7 @@ app.use(cors({
   credentials: true
 }));
 
-// On a cold start the request that woke the instance arrives before Mongo has
+// Right after a deploy or restart the first request can arrive before Mongo has
 // finished connecting, so wait for the connection rather than rejecting it.
 app.use('/api', (req, res, next) => {
   dbConnector().then(() => next(), (error) => {

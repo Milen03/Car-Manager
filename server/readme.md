@@ -2,13 +2,13 @@
 
 ## Base URL
 
-Production: `https://car-manager-508119.web.app/api` (same origin as the app)
+Production: `https://<your-project>.vercel.app/api` (same origin as the app; Vercel forwards `/api` to the server on Railway)
 
 Development: `http://localhost:3000/api` (the Vite dev server proxies `/api` there)
 
 ## Authentication
 
-Authentication uses the `__session` HTTP-only cookie (the only cookie name Firebase Hosting forwards to Cloud Run). Register or log in before using protected resources.
+Authentication uses the `__session` HTTP-only cookie. Register or log in before using protected resources.
 
 ### Auth endpoints
 

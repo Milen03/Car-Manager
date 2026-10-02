@@ -1,5 +1,3 @@
-// Firebase Hosting strips every cookie except `__session` from requests it
-// forwards to Cloud Run, so the auth cookie must use exactly this name.
 const authCookieName = '__session';
 const { isProduction } = require('./config/env');
 // The app sets no signed cookies, so a separate secret adds nothing; fall back to
@@ -10,8 +8,8 @@ if (isProduction && (!cookieSecret || cookieSecret.length < 32)) {
     throw new Error('SECRET (or COOKIESECRET) must be set to at least 32 characters in production');
 }
 
-// The client and API share an origin (Hosting rewrites /api to Cloud Run), so the
-// cookie is first-party: Lax works in every browser, including Safari, and blocks
+// The browser only talks to the Vercel domain, which proxies /api to Railway, so
+// the cookie is first-party: Lax works in every browser, including Safari, and blocks
 // cross-site request forgery.
 const authCookieOptions = {
     httpOnly: true,

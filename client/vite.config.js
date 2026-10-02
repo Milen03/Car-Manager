@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(),tailwindcss()],
   server: {
-    // Mirrors the Firebase Hosting rewrite so the auth cookie stays same-origin.
+    // Mirrors the Vercel rewrite so the auth cookie stays same-origin.
     proxy: {
       '/api': 'http://localhost:3000',
     },

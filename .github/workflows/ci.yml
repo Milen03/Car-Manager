@@ -1,7 +1,7 @@
 name: CI
 
 # Lint, build and test on every push and pull request. Deploys happen on their
-# own: Vercel builds the client and Railway builds the server from GitHub.
+# own: Vercel builds the client and the server from GitHub.
 on:
   push:
     branches: [main]

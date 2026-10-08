@@ -8,8 +8,8 @@ if (isProduction && (!cookieSecret || cookieSecret.length < 32)) {
     throw new Error('SECRET (or COOKIESECRET) must be set to at least 32 characters in production');
 }
 
-// The browser only talks to the Vercel domain, which proxies /api to Railway, so
-// the cookie is first-party: Lax works in every browser, including Safari, and blocks
+// The client and the API share an origin (vercel.json routes /api to the server
+// service), so the cookie is first-party: Lax works in every browser, including Safari, and blocks
 // cross-site request forgery.
 const authCookieOptions = {
     httpOnly: true,

@@ -8,7 +8,7 @@ const config = {
     },
     production: {
         port: process.env.PORT || 3000,
-        // MONGO_URL is the name Railway's MongoDB service uses.
+        // DB_URL is what the Vercel MongoDB Atlas integration sets with the prefix "DB".
         dbURL: process.env.DB_URL || process.env.MONGO_URL || process.env.MONGODB_URI,
         origin: (process.env.CLIENT_ORIGIN || '').split(',').map(origin => origin.trim()).filter(Boolean)
     }

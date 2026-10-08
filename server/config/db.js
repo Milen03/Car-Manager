@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 let connecting = null;
 
-// Connection strings from Railway and Atlas usually have no database in the path,
+// Connection strings from Atlas usually have no database in the path,
 // which would make Mongo use "test". Default to the same database name as local
 // development so migrated data is found.
 const defaultDbName = 'Car-Manager';

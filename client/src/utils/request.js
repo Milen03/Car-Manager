@@ -1,4 +1,20 @@
+import { handleDemoRequest } from '../demo/demoApi.js'
+import { baseUrl } from '../api/config.js'
+
 export const UNAUTHORIZED_EVENT = 'auth:unauthorized'
+
+const isDemo = import.meta.env.VITE_DEMO === 'true'
+
+// The demo build answers API calls in the browser instead of over the network.
+const demoFetch = async (method, url, data) => {
+    const { status, body } = await handleDemoRequest(method, url.slice(baseUrl.length), data)
+    return {
+        ok: status >= 200 && status < 300,
+        status,
+        headers: { get: () => 'application/json' },
+        json: async () => body,
+    }
+}
 
 const request = async (method, url, data, options = {})=>{
 
@@ -19,7 +35,7 @@ const request = async (method, url, data, options = {})=>{
         }
     }
 
-    const response = await fetch(url,options)
+    const response = isDemo ? await demoFetch(method, url, data) : await fetch(url,options)
     const responseContentType = response.headers.get('Content-Type')
     if(!responseContentType){
         return

@@ -1,5 +1,5 @@
-// Production serves the API from the same origin: Vercel rewrites /api to the
-// Railway server (see vercel.json). In development Vite proxies /api to the local
+// Production serves the API from the same origin: Vercel routes /api to the
+// server service (see vercel.json). In development Vite proxies /api to the local
 // server.
 const configuredApiUrl = import.meta.env.VITE_API_URL || '/api';
 

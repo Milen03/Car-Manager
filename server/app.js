@@ -1,4 +1,6 @@
-// The Express app, without starting a server; index.js listens on a port.
+// The Express app, without starting a server. index.js listens on a port for
+// local development; on Vercel the `server` service uses this file as its
+// entrypoint (see vercel.json).
 global.__basedir = global.__basedir || __dirname;
 require('dotenv').config();
 
@@ -11,10 +13,10 @@ const config = require('./config/config');
 const app = require('express')();
 require('./config/express')(app);
 
-// The browser reaches the API through Vercel's /api rewrite, i.e. from the same
-// origin as the client, and same-origin requests need no CORS headers. Other
-// origins only get them if listed in CLIENT_ORIGIN; anything else is left without CORS headers (so the browser blocks it) rather
-// than failing with a server error.
+// Vercel serves the client and the API from the same origin, and same-origin
+// requests need no CORS headers. Other origins only get them if listed in
+// CLIENT_ORIGIN; anything else is left without CORS headers (so the browser
+// blocks it) rather than failing with a server error.
 app.use(cors({
   origin: (origin, callback) => {
     callback(null, !origin || config.origin.includes(origin));

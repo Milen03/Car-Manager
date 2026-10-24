@@ -2,7 +2,7 @@
 
 ## Base URL
 
-Production: `https://<your-project>.vercel.app/api` (same origin as the app; Vercel forwards `/api` to the server on Railway)
+Production: `https://<your-project>.vercel.app/api` (same origin as the app)
 
 Development: `http://localhost:3000/api` (the Vite dev server proxies `/api` there)
 

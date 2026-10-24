@@ -65,12 +65,6 @@ database URL and a `SECRET` of 32+ characters.
   MongoDB. Check that the Atlas cluster is not paused. The server retries on the
   next request, so it recovers on its own.
 
-## Demo build (no server)
-
-`npm run build:demo` in `client/` builds a version whose API runs in the browser
-with sample data (`src/demo/demoApi.js`). The result is one self-contained page,
-`client/dist-demo/car-manager-demo.html`, that can be published anywhere static.
-
 ## Local development
 
 ```bash

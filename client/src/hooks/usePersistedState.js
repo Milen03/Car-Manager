@@ -1,22 +1,21 @@
 import { useCallback, useState } from "react"
-import { readItem, writeItem } from "../utils/storage.js"
 
 export default function usePersistedState(stateKey,initialState){
     const [state,setState] = useState(()=>{
-        const persistentStatetJSON = readItem(stateKey)
+        const persistentStatetJSON = localStorage.getItem(stateKey)
         if(!persistentStatetJSON){
             return initialState
         }
 
-        try {
-            return JSON.parse(persistentStatetJSON)
-        } catch {
-            return initialState
-        }
+        const persistentStatetData = JSON.parse(persistentStatetJSON)
+
+        return persistentStatetData
     })
 
     const setPersistentState = useCallback((data) =>{
-        writeItem(stateKey, JSON.stringify(data))
+        const persistedData = JSON.stringify(data)
+
+        localStorage.setItem(stateKey,persistedData)
         setState(data)
     }, [stateKey])
 

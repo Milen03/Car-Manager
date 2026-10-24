@@ -1,5 +1,4 @@
 import { useParams, useNavigate } from 'react-router'
-import confirmAction from '../../../utils/confirmAction.js'
 import { useCar, useDelete } from '../../../api/car.js'
 import { ServiceDetails } from './ServiceDetails.jsx'
 
@@ -10,7 +9,7 @@ export function CarDetails() {
     const navigate = useNavigate();
 
     const handleDelete = async () => {
-        if (!(await confirmAction('Сигурни ли сте, че искате да изтриете тази кола?'))) return;
+        if (!window.confirm('Сигурни ли сте, че искате да изтриете тази кола?')) return;
 
         const result = await deleteCar(id);
         if (!result) return;

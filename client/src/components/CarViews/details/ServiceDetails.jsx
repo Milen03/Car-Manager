@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import confirmAction from '../../../utils/confirmAction.js';
 import { useServicesByCar, createService, deleteService, editService } from '../../../api/service.js';
 
 const serviceTypeLabels = {
@@ -63,7 +62,7 @@ export function ServiceDetails({ carId }) {
     }
 
     const handleDelete = async (serviceId) => {
-        if (!(await confirmAction('Сигурни ли сте, че искате да изтриете тази работа?'))) return;
+        if (!window.confirm('Сигурни ли сте, че искате да изтриете тази работа?')) return;
 
         const result = await deleteService(serviceId);
         if (!result) return;

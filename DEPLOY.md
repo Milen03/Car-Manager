@@ -24,7 +24,7 @@ needs no CORS setup. Every push to `main` redeploys.
    32+ random characters, e.g. from https://generate-secret.vercel.app/32.
 3. **Add the database.** Open **Storage → Create Database → MongoDB Atlas**, pick
    the free plan and connect it to the project. In the **Connect a Project**
-   dialog, set **Custom Prefix** to `DB`, so the variable is named `DB_URL`.
+   dialog, set **Custom Prefix** to `DB`, so the variable is named `DB_MONGODB_URI`.
 4. **Redeploy.** Choose **Deployments → ⋯ → Redeploy**, so the new variables are
    picked up.
 
@@ -47,7 +47,7 @@ working.
 
 | Variable | Required | Notes |
 | --- | --- | --- |
-| `DB_URL` | yes | MongoDB connection string. `MONGO_URL` or `MONGODB_URI` also work. Without a database in the path, `Car-Manager` is used. |
+| `DB_MONGODB_URI` | yes | MongoDB connection string, set by the Atlas integration. `DB_URL`, `MONGODB_URI` or `MONGO_URL` also work. Without a database in the path, `Car-Manager` is used. |
 | `SECRET` | yes | ≥ 32 characters, signs session tokens |
 | `COOKIESECRET` | no | falls back to `SECRET` |
 | `CLIENT_ORIGIN` | no | comma-separated origins allowed to call the API from another site |
@@ -59,7 +59,7 @@ database URL and a `SECRET` of 32+ characters.
 ## Troubleshooting
 
 - **`/api/*` returns `FUNCTION_INVOCATION_FAILED`.** The server stopped at
-  startup. `DB_URL` or `SECRET` is missing, or the deployment predates them.
+  startup. `DB_MONGODB_URI` or `SECRET` is missing, or the deployment predates them.
   Check **Settings → Environment Variables** and redeploy.
 - **`503 {"message":"Database is unavailable"}`.** The API is up but can't reach
   MongoDB. Check that the Atlas cluster is not paused. The server retries on the

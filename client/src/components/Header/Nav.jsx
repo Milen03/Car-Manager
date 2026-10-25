@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 import { userContext } from '../../contexts/userContext.js'
 import { useLogout } from '../../api/auth.js'
 
@@ -8,6 +8,8 @@ export default function Nav() {
     const { username } = useContext(userContext)
     const { logout } = useLogout()
     const navigate = useNavigate()
+    const { pathname } = useLocation()
+    const isHome = pathname === '/'
 
     const handleLogout = async () => {
         setMobileMenuOpen(false)
@@ -31,7 +33,11 @@ export default function Nav() {
 
     return (
         <header className="fixed inset-x-0 top-0 z-20">
-            <nav className="flex items-center justify-between px-6 py-4 lg:px-12 bg-gray-950/70 backdrop-blur border-b border-gray-800">
+            <nav
+                className={`flex items-center justify-between px-6 py-4 lg:px-12 ${
+                    isHome ? 'bg-transparent' : 'bg-gray-950/70 backdrop-blur border-b border-gray-800'
+                }`}
+            >
                 <Link to="/" aria-label="Начало" className="shrink-0">
                     <img
                         src="/car-manager-logo.svg"

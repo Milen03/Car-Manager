@@ -13,9 +13,9 @@ export function Home() {
 
             <div className="relative text-center space-y-6 max-w-xl">
                 <img
-                    src="/Car-Managers-LOGO.png"
+                    src="/car-manager-logo.svg"
                     alt="Car Manager"
-                    className="mx-auto h-52 w-auto object-contain opacity-0 [animation:fadeUp_0.6s_ease-out_forwards] drop-shadow-[0_0_18px_rgba(250,204,21,0.45)]"
+                    className="mx-auto w-full max-w-lg h-auto opacity-0 [animation:fadeUp_0.6s_ease-out_forwards] drop-shadow-[0_0_18px_rgba(250,204,21,0.45)]"
                 />
                
                 <p className="text-gray-400 text-lg opacity-0 [animation:fadeUp_0.6s_ease-out_0.2s_forwards]">

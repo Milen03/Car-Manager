@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Car Manager">
+<title>Car Manager</title>
+<rect width="120" height="120" rx="26" fill="#111214"/>
+<g transform="translate(6 2) scale(0.9)">
+<path d="M27.47 96.53 A46 46 0 1 1 92.53 96.53" fill="none" stroke="#FFD000" stroke-opacity="0.28" stroke-width="11" stroke-linecap="round"/>
+<path d="M27.47 96.53 A46 46 0 0 1 89.57 28.76" fill="none" stroke="#FFD000" stroke-width="11" stroke-linecap="round"/>
+<path d="M60 64 L81.9 38" fill="none" stroke="#F5F2EA" stroke-width="7" stroke-linecap="round"/>
+<circle cx="60" cy="64" r="9.5" fill="#FFD000"/>
+<circle cx="60" cy="64" r="3.5" fill="#111214"/>
+</g>
+</svg>

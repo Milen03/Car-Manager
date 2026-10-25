@@ -34,9 +34,9 @@ export default function Nav() {
             <nav className="flex items-center justify-between px-6 py-4 lg:px-12 bg-gray-950/70 backdrop-blur border-b border-gray-800">
                 <Link to="/" aria-label="Начало" className="shrink-0">
                     <img
-                        src="/Car-Managers-LOGO.png"
+                        src="/car-manager-logo.svg"
                         alt="Car Manager"
-                        className="h-16 w-auto object-contain"
+                        className="h-10 w-auto"
                     />
                 </Link>
 
@@ -92,9 +92,9 @@ export default function Nav() {
                         <div className="flex items-center justify-between">
                             <Link to="/" aria-label="Начало" onClick={() => setMobileMenuOpen(false)}>
                                 <img
-                                    src="/Car-Managers-LOGO.png"
+                                    src="/car-manager-logo.svg"
                                     alt="Car Manager"
-                                    className="h-16 w-auto object-contain"
+                                    className="h-10 w-auto"
                                 />
                             </Link>
                             <button

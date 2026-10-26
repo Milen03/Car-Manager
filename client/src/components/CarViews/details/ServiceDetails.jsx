@@ -13,6 +13,53 @@ const serviceTypeLabels = {
 
 const dateBasedTypes = ['Vignette', 'Tires'];
 
+const kmIntervalPresets = [5000, 10000, 15000];
+
+const inputClassName = 'w-full px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/60 focus:border-yellow-500 transition-colors';
+
+function ChangeEveryKmField({ defaultValue }) {
+    const hasValue = defaultValue != null && defaultValue !== '';
+    const isPreset = !hasValue || kmIntervalPresets.includes(Number(defaultValue));
+    const [choice, setChoice] = useState(
+        !hasValue ? '' : (isPreset ? String(defaultValue) : 'custom')
+    );
+
+    return (
+        <div className="space-y-2">
+            <label className="block text-sm text-gray-400">Смяна на всеки (км)</label>
+            <select
+                required
+                value={choice}
+                onChange={(e) => setChoice(e.target.value)}
+                className={inputClassName}
+            >
+                <option value="" disabled>Избери интервал</option>
+                {kmIntervalPresets.map(km => (
+                    <option key={km} value={km}>{km.toLocaleString('bg-BG')} км</option>
+                ))}
+                <option value="custom">Друг</option>
+            </select>
+            {choice === 'custom' ? (
+                <input
+                    type="number"
+                    name="changeEveryKm"
+                    placeholder="Смяна на всеки (км)"
+                    defaultValue={isPreset ? '' : defaultValue}
+                    min="1"
+                    required
+                    className={inputClassName}
+                />
+            ) : (
+                <input type="hidden" name="changeEveryKm" value={choice} />
+            )}
+        </div>
+    );
+}
+
+ChangeEveryKmField.propTypes = {
+    defaultValue: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+}
+
 export function ServiceDetails({ carId }) {
     const fetchedServices = useServicesByCar(carId);
     const [services, setServices] = useState([]);
@@ -140,14 +187,7 @@ export function ServiceDetails({ carId }) {
                                 required
                                 className="w-full px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/60 focus:border-yellow-500 transition-colors"
                             />
-                            <input
-                                type="number"
-                                name="changeEveryKm"
-                                placeholder="Смяна на всеки (км)"
-                                min="1"
-                                required
-                                className="w-full px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/60 focus:border-yellow-500 transition-colors"
-                            />
+                            <ChangeEveryKmField />
                         </>
                     )}
                     <textarea
@@ -211,15 +251,7 @@ export function ServiceDetails({ carId }) {
                                                 required
                                                 className="w-full px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/60 focus:border-yellow-500 transition-colors"
                                             />
-                                            <input
-                                                type="number"
-                                                name="changeEveryKm"
-                                                placeholder="Смяна на всеки (км)"
-                                                defaultValue={service.changeEveryKm}
-                                                min="1"
-                                                required
-                                                className="w-full px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/60 focus:border-yellow-500 transition-colors"
-                                            />
+                                            <ChangeEveryKmField defaultValue={service.changeEveryKm} />
                                         </>
                                     )}
                                     <textarea

@@ -37,9 +37,12 @@ const createService = async (req, res)  => {
         if (!newService) {
             return res.status(400).json({ error: 'Failed to create service' });
         }
-        // Add service to Car's services array
-        await Car.findByIdAndUpdate(carId, { $push: { services: newService._id } });
-        
+        // Add service to Car's services array and move the odometer forward ($max never lowers it)
+        await Car.findByIdAndUpdate(carId, {
+            $push: { services: newService._id },
+            ...(dateBasedTypes.includes(type) ? {} : { $max: { mileage: Number(mileagesAtService) } })
+        });
+
         res.status(201).json(newService);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -82,7 +85,7 @@ const editService = async (req, res) => {
             return res.status(400).json({ error: 'Mileage fields are required for this service type' });
         }
         if (!dateBasedTypes.includes(type)) {
-            const mileageError = validateServiceMileage(car.mileage, mileagesAtService);
+            const mileageError = validateServiceMileage(car.mileage, mileagesAtService, service.mileagesAtService);
             if (mileageError) {
                 return res.status(400).json({ error: mileageError });
             }
@@ -99,7 +102,10 @@ const editService = async (req, res) => {
         }, { new: true, runValidators: true });
         if (!updatedService) {
             return res.status(404).json({ error: 'Service not found' });
-        }   
+        }
+        if (!dateBasedTypes.includes(type) && Number(mileagesAtService) > car.mileage) {
+            await Car.findByIdAndUpdate(car._id, { $max: { mileage: Number(mileagesAtService) } });
+        }
         res.status(200).json(updatedService);
     } catch (error) {
         res.status(500).json({ error: error.message });

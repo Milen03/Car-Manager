@@ -4,9 +4,14 @@ import { ServiceDetails } from './ServiceDetails.jsx'
 
 export function CarDetails() {
     const { id } = useParams();
-    const { car } = useCar(id);
+    const { car, setCar } = useCar(id);
     const { deleteCar } = useDelete();
     const navigate = useNavigate();
+
+    // Mirrors the server, which moves the car's mileage forward when a service is saved
+    const handleServiceMileage = (mileage) => {
+        setCar(prev => ({ ...prev, mileage: Math.max(prev.mileage, mileage) }));
+    }
 
     const handleDelete = async () => {
         if (!window.confirm('Сигурни ли сте, че искате да изтриете тази кола?')) return;
@@ -89,7 +94,7 @@ export function CarDetails() {
                 </div>
             </section>
 
-            <ServiceDetails carId={id} />
+            <ServiceDetails carId={id} carMileage={car.mileage} onMileageChange={handleServiceMileage} />
         </div>
     )
 }

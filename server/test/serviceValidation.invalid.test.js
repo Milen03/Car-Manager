@@ -19,3 +19,10 @@ test('rejects zero service mileage for a car that has been driven', () => {
 test('rejects negative service mileage', () => {
     assert.equal(validateServiceMileage(0, -1), mileageError);
 });
+test('rejects service mileage that is not a number', () => {
+    assert.equal(validateServiceMileage(120000, 'abc'), 'Service mileage must be a number');
+});
+
+test('rejects an empty service mileage', () => {
+    assert.equal(validateServiceMileage(120000, ''), 'Service mileage must be a number');
+});

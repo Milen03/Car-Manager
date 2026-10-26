@@ -45,7 +45,8 @@ export const useCar = (id) => {
     }, [id]);
 
     return {
-        car
+        car,
+        setCar
     }
 }
 

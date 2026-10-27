@@ -60,7 +60,7 @@ ChangeEveryKmField.propTypes = {
     defaultValue: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 }
 
-export function ServiceDetails({ carId }) {
+export function ServiceDetails({ carId, carMileage, onMileageChange }) {
     const fetchedServices = useServicesByCar(carId);
     const [services, setServices] = useState([]);
     const [showForm, setShowForm] = useState(false);
@@ -72,16 +72,21 @@ export function ServiceDetails({ carId }) {
         setServices(fetchedServices);
     }, [fetchedServices]);
 
-    const validateServiceData = ({ type, changeEveryKm, date }) => {
+    // previousMileage is the stored mileage when editing: an unchanged value is allowed even
+    // if the car has been driven past it since, so older records stay editable.
+    const validateServiceData = ({ type, mileagesAtService, changeEveryKm, date }, previousMileage) => {
         if (dateBasedTypes.includes(type)) {
             if (!date) {
                 return 'Датата е задължителна за този вид работа.';
             }
             return null;
         }
+        const mileage = Number(mileagesAtService);
+        if (mileage !== previousMileage && mileage < carMileage) {
+            return `Пробегът при извършване (${mileage.toLocaleString('bg-BG')} км) не може да е по-малък от текущия пробег на колата (${carMileage.toLocaleString('bg-BG')} км).`;
+        }
         // changeEveryKm is an interval ("every 10 000 km"), not an odometer reading, so it
-        // is not comparable to mileagesAtService. The server checks that
-        // mileagesAtService is not below the car's mileage.
+        // is not comparable to mileagesAtService.
         if (!(Number(changeEveryKm) > 0)) {
             return 'Интервалът за смяна трябва да е положително число.';
         }
@@ -102,6 +107,9 @@ export function ServiceDetails({ carId }) {
         const result = await createService(carId, data);
         if (!result) return;
 
+        if (!dateBasedTypes.includes(result.type)) {
+            onMileageChange(result.mileagesAtService);
+        }
         setServices(prev => [...prev, result]);
         setShowForm(false);
         setFormType('');
@@ -117,21 +125,24 @@ export function ServiceDetails({ carId }) {
         setServices(prev => prev.filter(service => service._id !== serviceId));
     }
 
-    const handleEditSubmit = async (e, serviceId) => {
+    const handleEditSubmit = async (e, service) => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
 
-        const validationError = validateServiceData(data);
+        const validationError = validateServiceData(data, service.mileagesAtService);
         if (validationError) {
             alert(validationError);
             return;
         }
 
-        const result = await editService(serviceId, data);
+        const result = await editService(service._id, data);
         if (!result) return;
 
-        setServices(prev => prev.map(service => service._id === serviceId ? result : service));
+        if (!dateBasedTypes.includes(result.type)) {
+            onMileageChange(result.mileagesAtService);
+        }
+        setServices(prev => prev.map(item => item._id === service._id ? result : item));
         setEditingId(null);
     }
 
@@ -182,7 +193,7 @@ export function ServiceDetails({ carId }) {
                             <input
                                 type="number"
                                 name="mileagesAtService"
-                                placeholder="Пробег при извършване (км)"
+                                placeholder={`Пробег при извършване (текущ: ${carMileage.toLocaleString('bg-BG')} км)`}
                                 min="0"
                                 required
                                 className="w-full px-4 py-2.5 rounded-xl bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500/60 focus:border-yellow-500 transition-colors"
@@ -218,7 +229,7 @@ export function ServiceDetails({ carId }) {
                         >
                             {editingId === service._id ? (
                                 <form
-                                    onSubmit={(e) => handleEditSubmit(e, service._id)}
+                                    onSubmit={(e) => handleEditSubmit(e, service)}
                                     className="w-full space-y-3"
                                 >
                                     <select
@@ -329,4 +340,6 @@ export function ServiceDetails({ carId }) {
 
 ServiceDetails.propTypes = {
     carId: PropTypes.string.isRequired,
+    carMileage: PropTypes.number.isRequired,
+    onMileageChange: PropTypes.func.isRequired,
 }
